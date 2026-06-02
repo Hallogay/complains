@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #13161e;
+      --border:   #252932;
+      --accent:   #c8f04a;
+      --accent2:  #4af0c8;
+      --text:     #e8eaf0;
+      --muted:    #5a6070;
+      --error:    #f04a6a;
+      --radius:   6px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 540px;
+      padding: 2.5rem 2.5rem 2rem;
+      position: relative;
+      animation: rise .5s ease both;
+    }
+
+    /* Accent top bar */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 2rem; right: 2rem;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 0 0 4px 4px;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header { margin-bottom: 2rem; }
+
+    .tag {
+      display: inline-block;
+      font-family: var(--font-head);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(200,240,74,.08);
+      border: 1px solid rgba(200,240,74,.2);
+      padding: .25em .7em;
+      border-radius: 4px;
+      margin-bottom: .8rem;
+    }
+
+    h1 {
+      font-family: var(--font-head);
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .subtitle {
+      margin-top: .5rem;
+      font-size: .88rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .field { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 400;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .45rem;
+    }
+
+    label .req { color: var(--accent); margin-left: 2px; }
+    label .opt { color: var(--muted); font-size: .7rem; font-style: italic; text-transform: none; letter-spacing: 0; }
+
+    select, input[type="text"], textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: .93rem;
+      padding: .7rem .85rem;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6070' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2.2rem; }
+
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+    select:focus, input[type="text"]:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,240,74,.1);
+    }
+
+    /* Invalid state */
+    input.invalid, select.invalid, textarea.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(240,74,106,.1);
+    }
+
+    .field-error {
+      font-size: .75rem;
+      color: var(--error);
+      margin-top: .35rem;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .hint {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .35rem;
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: .5rem;
+      padding: .85rem;
+      background: var(--accent);
+      color: #0d0f14;
+      font-family: var(--font-head);
+      font-size: .95rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    .submit-btn:hover  { opacity: .88; }
+    .submit-btn:active { transform: scale(.98); }
+    .submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Success banner ───────────────────────────────────────── */
+    #success-banner {
+      display: none;
+      align-items: center;
+      gap: .75rem;
+      background: rgba(74,240,200,.07);
+      border: 1px solid rgba(74,240,200,.3);
+      border-radius: var(--radius);
+      padding: .9rem 1rem;
+      margin-bottom: 1.5rem;
+      font-size: .9rem;
+      color: var(--accent2);
+      animation: fadeIn .3s ease both;
+    }
+    #success-banner.show { display: flex; }
+    #success-banner svg { flex-shrink: 0; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Server error banner ──────────────────────────────────── */
+    #server-error {
+      display: none;
+      background: rgba(240,74,106,.07);
+      border: 1px solid rgba(240,74,106,.3);
+      border-radius: var(--radius);
+      padding: .75rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: .85rem;
+      color: var(--error);
+    }
+    #server-error.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="tag">Feedback</div>
+      <h1>Send us a message</h1>
+      <p class="subtitle">We read everything — honest.</p>
+    </div>
+
+    <!-- Success banner (hidden until submit succeeds) -->
+    <div id="success-banner" role="alert">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Your message has been sent.
+    </div>
+
+    <!-- Server-side error banner -->
+    <div id="server-error" role="alert"></div>
+
+    <form id="feedback-form" novalidate>
+
+      <!-- Message Type -->
+      <div class="field">
+        <label for="type">Message Type <span class="req">*</span></label>
+        <select id="type" name="type">
+          <option value="" disabled selected>Select a type…</option>
+          <option value="Complaint">Complaint</option>
+          <option value="Suggestion">Suggestion</option>
+          <option value="Inquiry">Inquiry</option>
+          <option value="Reporting">Reporting</option>
+        </select>
+        <span class="field-error" id="type-error">Please select a message type.</span>
+      </div>
+
+      <!-- Message Body -->
+      <div class="field">
+        <label for="body">Message <span class="req">*</span></label>
+        <textarea id="body" name="body" placeholder="Write your message here…"></textarea>
+        <span class="field-error" id="body-error">Please enter a message.</span>
+      </div>
+
+      <!-- Name -->
+      <div class="field">
+        <label for="name">Name <span class="opt">(optional)</span></label>
+        <input type="text" id="name" name="name" placeholder="Your name" />
+      </div>
+
+      <!-- Grade -->
+      <div class="field">
+        <label for="grade">Grade <span class="opt">(optional)</span></label>
+        <!--
+          GRADE VALIDATION — Regex: /^(1[0-2]|[1-9])[a-d]$/
+          Breakdown:
+            ^          start of string
+            (1[0-2]    match 10, 11, or 12
+            |[1-9])    OR a single digit 1–9
+            [a-d]      immediately followed by exactly one of: a, b, c, d
+            $          end of string
+
+          Accepts:  "1a", "5c", "10b", "12d"
+          Rejects:  "0a" (0 invalid), "13a" (>12), "1e" (bad letter),
+                    "1 a" (space), "01a" (leading zero), ""12"" (no letter)
+        -->
+        <input type="text" id="grade" name="grade" placeholder="e.g. 7b, 12a" maxlength="3" />
+        <span class="field-error" id="grade-error">Must be 1–12 followed by a, b, c, or d (e.g. "8b", "12a").</span>
+        <p class="hint">Format: grade number (1–12) + class letter (a–d)</p>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Send Message</button>
+    </form>
+  </div>
+
+  <script>
+    // ── Regex (matches server-side) ─────────────────────────────
+    // ^(1[0-2]|[1-9])[a-d]$
+    // 1[0-2]  → 10, 11, 12
+    // [1-9]   → 1 through 9
+    // [a-d]   → letter a, b, c, or d immediately after the number
+    const GRADE_REGEX = /^(1[0-2]|[1-9])[a-d]$/;
+
+    const form          = document.getElementById("feedback-form");
+    const successBanner = document.getElementById("success-banner");
+    const serverError   = document.getElementById("server-error");
+    const submitBtn     = document.getElementById("submit-btn");
+
+    // ── Helpers ─────────────────────────────────────────────────
+    function setError(fieldId, errorId, show) {
+      document.getElementById(fieldId).classList.toggle("invalid", show);
+      document.getElementById(errorId).classList.toggle("show", show);
+    }
+
+    function clearError(fieldId, errorId) {
+      setError(fieldId, errorId, false);
+    }
+
+    // Live-clear errors as the user corrects fields
+    document.getElementById("type").addEventListener("change",  () => clearError("type",  "type-error"));
+    document.getElementById("body").addEventListener("input",   () => clearError("body",  "body-error"));
+    document.getElementById("grade").addEventListener("input",  () => clearError("grade", "grade-error"));
+
+    // ── Submit handler ──────────────────────────────────────────
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // prevent page reload
+
+      // Hide banners
+      successBanner.classList.remove("show");
+      serverError.classList.remove("show");
+
+      const type  = document.getElementById("type").value;
+      const body  = document.getElementById("body").value.trim();
+      const name  = document.getElementById("name").value.trim();
+      const grade = document.getElementById("grade").value.trim();
+
+      // Validate
+      let valid = true;
+
+      if (!type) {
+        setError("type", "type-error", true);
+        valid = false;
+      }
+      if (!body) {
+        setError("body", "body-error", true);
+        valid = false;
+      }
+      // Grade is optional — only validate if the user typed something
+      if (grade && !GRADE_REGEX.test(grade)) {
+        setError("grade", "grade-error", true);
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      // Submit to backend
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending…";
+
+      try {
+        const res = await fetch("/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, body, name: name || null, grade: grade || null }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          form.reset();                        // clear all fields
+          successBanner.classList.add("show"); // show confirmation
+        } else {
+          serverError.textContent = data.error || "Something went wrong. Please try again.";
+          serverError.classList.add("show");
+        }
+      } catch {
+        serverError.textContent = "Network error — please check your connection and try again.";
+        serverError.classList.add("show");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Message";
+      }
+    });
+  </script>
+</body>
+</html>

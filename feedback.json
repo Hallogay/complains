@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1780366826774,
+    "type": "Complaint",
+    "body": "Someone peed in the sink",
+    "name": "Joe",
+    "grade": "7d",
+    "submittedAt": "2026-06-02T02:20:26.774Z"
+  },
+  {
+    "id": 1780367904990,
+    "type": "Complaint",
+    "body": "dssdf",
+    "name": "g",
+    "grade": "12b",
+    "submittedAt": "2026-06-02T02:38:24.990Z"
+  }
+]

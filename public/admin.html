@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Feedback Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0d0f14;
+        --surface: #13161e;
+        --surface2: #181c26;
+        --border: #252932;
+        --accent: #c8f04a;
+        --accent2: #4af0c8;
+        --text: #e8eaf0;
+        --muted: #5a6070;
+        --error: #f04a6a;
+        --radius: 6px;
+        --font-head: "Syne", sans-serif;
+        --font-body: "DM Sans", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        min-height: 100vh;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 48px 48px;
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ══════════════════════════════════════════
+       LOGIN SCREEN
+    ══════════════════════════════════════════ */
+      #login-screen {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+
+      .login-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 380px;
+        padding: 2.5rem 2rem;
+        position: relative;
+        animation: rise 0.4s ease both;
+      }
+
+      .login-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 1.5rem;
+        right: 1.5rem;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        border-radius: 0 0 4px 4px;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .lock-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(200, 240, 74, 0.08);
+        border: 1px solid rgba(200, 240, 74, 0.2);
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 1.2rem;
+        color: var(--accent);
+      }
+
+      .login-card h2 {
+        font-family: var(--font-head);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .login-card p {
+        font-size: 0.83rem;
+        color: var(--muted);
+        margin-top: 0.3rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .login-card label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+      }
+
+      .login-card input {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 0.93rem;
+        padding: 0.7rem 0.85rem;
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .login-card input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(200, 240, 74, 0.1);
+      }
+
+      #login-error {
+        display: none;
+        font-size: 0.78rem;
+        color: var(--error);
+        margin-top: 0.45rem;
+      }
+      #login-error.show {
+        display: block;
+      }
+
+      .login-btn {
+        width: 100%;
+        margin-top: 1.2rem;
+        padding: 0.8rem;
+        background: var(--accent);
+        color: #0d0f14;
+        font-family: var(--font-head);
+        font-size: 0.93rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .login-btn:hover {
+        opacity: 0.88;
+      }
+      .login-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* ══════════════════════════════════════════
+       DASHBOARD
+    ══════════════════════════════════════════ */
+      #dashboard {
+        display: none;
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+      }
+
+      /* Top nav */
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(13, 15, 20, 0.85);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .nav-brand {
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .nav-brand span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+      }
+
+      .logout-btn {
+        font-size: 0.78rem;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.35rem 0.8rem;
+        cursor: pointer;
+        font-family: var(--font-body);
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .logout-btn:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+
+      /* Main content */
+      .main {
+        padding: 2rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .page-header h1 {
+        font-family: var(--font-head);
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      #count-badge {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* Filter bar */
+      .filters {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+
+      .filter-btn {
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 99px;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .filter-btn:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+      .filter-btn.active {
+        background: var(--accent);
+        color: #0d0f14;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+
+      /* Cards */
+      #feedback-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .feedback-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.25rem;
+        transition: border-color 0.15s;
+        animation: rise 0.3s ease both;
+      }
+      .feedback-card:hover {
+        border-color: var(--muted);
+      }
+
+      .card-top {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .type-pill {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 0.2em 0.65em;
+        border-radius: 4px;
+        border: 1px solid;
+      }
+
+      .type-pill.Complaint {
+        color: #f04a6a;
+        border-color: rgba(240, 74, 106, 0.4);
+        background: rgba(240, 74, 106, 0.07);
+      }
+      .type-pill.Suggestion {
+        color: #c8f04a;
+        border-color: rgba(200, 240, 74, 0.4);
+        background: rgba(200, 240, 74, 0.07);
+      }
+      .type-pill.Inquiry {
+        color: #4af0c8;
+        border-color: rgba(74, 240, 200, 0.4);
+        background: rgba(74, 240, 200, 0.07);
+      }
+      .type-pill.Reporting {
+        color: #f0b44a;
+        border-color: rgba(240, 180, 74, 0.4);
+        background: rgba(240, 180, 74, 0.07);
+      }
+
+      .sender-name {
+        font-size: 0.83rem;
+        font-weight: 400;
+        color: var(--text);
+      }
+      .sender-anon {
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .grade-chip {
+        font-size: 0.72rem;
+        color: var(--muted);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.15em 0.5em;
+      }
+
+      .card-meta {
+        margin-left: auto;
+        font-size: 0.72rem;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .card-body {
+        font-size: 0.9rem;
+        line-height: 1.65;
+        color: var(--text);
+        white-space: pre-wrap;
+      }
+
+      /* Empty state */
+      #empty-state {
+        display: none;
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--muted);
+      }
+      #empty-state p {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      /* Loading */
+      #loading {
+        text-align: center;
+        padding: 3rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      /* ── DELETE BUTTON (new) ──────────────────────────────────── */
+      .delete-btn {
+        background: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 0.25rem;
+        display: grid;
+        place-items: center;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+        flex-shrink: 0;
+      }
+      .delete-btn:hover {
+        color: var(--error);
+        border-color: var(--error);
+      }
+      .delete-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── LOGIN SCREEN ─────────────────────────────────────────── -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div class="lock-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect
+              x="4"
+              y="9"
+              width="12"
+              height="9"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+            <path
+              d="M7 9V6a3 3 0 016 0v3"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <h2>Admin Access</h2>
+        <p>Enter your password to view feedback submissions.</p>
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+        <div id="login-error">Incorrect password. Please try again.</div>
+        <button class="login-btn" id="login-btn">Log in</button>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD ─────────────────────────────────────────────── -->
+    <div id="dashboard">
+      <nav class="nav">
+        <div class="nav-brand"><span></span> Feedback Dashboard</div>
+        <button class="logout-btn" id="logout-btn">Log out</button>
+      </nav>
+
+      <main class="main">
+        <div class="page-header">
+          <h1>Submissions</h1>
+          <span id="count-badge"></span>
+        </div>
+
+        <!-- Filter by type -->
+        <div class="filters">
+          <button class="filter-btn active" data-filter="All">All</button>
+          <button class="filter-btn" data-filter="Complaint">Complaints</button>
+          <button class="filter-btn" data-filter="Suggestion">
+            Suggestions
+          </button>
+          <button class="filter-btn" data-filter="Inquiry">Inquiries</button>
+          <button class="filter-btn" data-filter="Reporting">Reporting</button>
+        </div>
+
+        <div id="loading">Loading submissions…</div>
+        <div id="empty-state">
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            fill="none"
+            style="margin: 0 auto 1rem; display: block; color: var(--muted)"
+          >
+            <rect
+              x="6"
+              y="6"
+              width="24"
+              height="24"
+              rx="4"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+            <path
+              d="M12 13h12M12 18h8"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+          <strong>No submissions yet</strong>
+          <p>New feedback will appear here.</p>
+        </div>
+        <div id="feedback-list"></div>
+      </main>
+    </div>
+
+    <script>
+      // ── State ───────────────────────────────────────────────────
+      let token = sessionStorage.getItem("admin_token") || null;
+      let allFeedback = [];
+      let activeFilter = "All";
+
+      // ── DOM refs ────────────────────────────────────────────────
+      const loginScreen = document.getElementById("login-screen");
+      const dashboard = document.getElementById("dashboard");
+      const passwordInput = document.getElementById("password");
+      const loginBtn = document.getElementById("login-btn");
+      const loginError = document.getElementById("login-error");
+      const logoutBtn = document.getElementById("logout-btn");
+      const feedbackList = document.getElementById("feedback-list");
+      const emptyState = document.getElementById("empty-state");
+      const loadingEl = document.getElementById("loading");
+      const countBadge = document.getElementById("count-badge");
+
+      // ── Startup: if token exists, skip login ────────────────────
+      if (token) showDashboard();
+
+      // ── Login ───────────────────────────────────────────────────
+      loginBtn.addEventListener("click", async () => {
+        const pw = passwordInput.value;
+        if (!pw) return;
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Logging in…";
+        loginError.classList.remove("show");
+
+        try {
+          const res = await fetch("/api/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: pw }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            token = data.token;
+            sessionStorage.setItem("admin_token", token);
+            showDashboard();
+          } else {
+            loginError.classList.add("show");
+          }
+        } catch {
+          loginError.textContent = "Network error. Is the server running?";
+          loginError.classList.add("show");
+        } finally {
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Log in";
+        }
+      });
+
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") loginBtn.click();
+      });
+
+      // ── Logout ──────────────────────────────────────────────────
+      logoutBtn.addEventListener("click", () => {
+        token = null;
+        sessionStorage.removeItem("admin_token");
+        allFeedback = [];
+        feedbackList.innerHTML = "";
+        dashboard.style.display = "none";
+        loginScreen.style.display = "flex";
+        passwordInput.value = "";
+      });
+
+      // ── Show dashboard & fetch data ─────────────────────────────
+      function showDashboard() {
+        loginScreen.style.display = "none";
+        dashboard.style.display = "block";
+        fetchFeedback();
+      }
+
+      // ── Fetch feedback from the backend ─────────────────────────
+      async function fetchFeedback() {
+        loadingEl.style.display = "block";
+        feedbackList.innerHTML = "";
+        emptyState.style.display = "none";
+
+        try {
+          const res = await fetch("/api/admin/feedback", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.status === 403) {
+            token = null;
+            sessionStorage.removeItem("admin_token");
+            location.reload();
+            return;
+          }
+
+          allFeedback = await res.json();
+          renderFeedback();
+        } catch {
+          loadingEl.textContent = "Failed to load — is the server running?";
+        }
+      }
+
+      // ── Filter buttons ──────────────────────────────────────────
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeFilter = btn.dataset.filter;
+          renderFeedback();
+        });
+      });
+
+      // ── Render feedback cards ───────────────────────────────────
+      function renderFeedback() {
+        loadingEl.style.display = "none";
+        feedbackList.innerHTML = "";
+
+        const filtered =
+          activeFilter === "All"
+            ? allFeedback
+            : allFeedback.filter((f) => f.type === activeFilter);
+
+        countBadge.textContent = `${filtered.length} of ${allFeedback.length} submission${allFeedback.length !== 1 ? "s" : ""}`;
+
+        if (filtered.length === 0) {
+          emptyState.style.display = "block";
+          return;
+        }
+
+        emptyState.style.display = "none";
+
+        filtered.forEach((entry) => {
+          const date = new Date(entry.submittedAt).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          const card = document.createElement("div");
+          card.className = "feedback-card";
+          card.innerHTML = `
+          <div class="card-top">
+            <span class="type-pill ${entry.type}">${entry.type}</span>
+            <span class="sender-name ${!entry.name ? "sender-anon" : ""}">
+              ${entry.name || "Anonymous"}
+            </span>
+            ${entry.grade ? `<span class="grade-chip">Grade ${entry.grade}</span>` : ""}
+            <span class="card-meta">${date}</span>
+            <button class="delete-btn" data-id="${entry.id}" title="Delete">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="card-body">${escapeHtml(entry.body)}</div>
+        `;
+          feedbackList.appendChild(card);
+        });
+      }
+
+      // ── Delete handler (new) ────────────────────────────────────
+      feedbackList.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".delete-btn");
+        if (!btn) return;
+
+        if (!confirm("Delete this submission?")) return;
+
+        const id = btn.dataset.id;
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(`/api/admin/feedback/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            allFeedback = allFeedback.filter((f) => String(f.id) !== id);
+            renderFeedback();
+          } else {
+            alert("Could not delete. Try again.");
+            btn.disabled = false;
+          }
+        } catch {
+          alert("Network error.");
+          btn.disabled = false;
+        }
+      });
+
+      // ── Safety: escape HTML in user content ─────────────────────
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+    </script>
+  </body>
+</html>
